@@ -7,12 +7,10 @@ import html
 
 # API description here: https://api.stackexchange.com/docs/questions
 class SOClient:
-    def __init__(self, token=None):
-        # self.TOKEN = {'Authorization': 'OAuth ' + token}
+    def __init__(self):
         self.HOST_API = 'https://api.stackexchange.com'
         self.QUESTIONS_SCHEME = '/2.2/questions'
         self.USER_AGENT = {"User-Agent": "Netology"}
-        # self.HEADERS = {**self.USER_AGENT, **self.TOKEN}
         self.HEADERS = {**self.USER_AGENT}
         self.QUESTIONS_PARAMS = {'site': 'stackoverflow', 'order': 'desc', 'sort': 'activity'}
 
@@ -33,6 +31,7 @@ class SOClient:
         return 'method not defined'
 
     def get_questions(self, days_ago=2, tag='python', pagesize=100):
+        """Method returns list of stackoverflow questions for specified period and tag"""
         result = []
         page = 1
         try:
@@ -42,6 +41,7 @@ class SOClient:
                 params = {'fromdate': fromdate, 'tagged': tag,
                           'pagesize': pagesize, 'page': page, **self.QUESTIONS_PARAMS}
                 request = self.__do_request('get', url=self.HOST_API + self.QUESTIONS_SCHEME, params=params)
+                # in case of network or API error we return this error and all questions grabbed before
                 if not (200 <= request.status_code < 300):
                     result += [f'Request failed. Error code: {request.status_code} ('
                                f'{responses[request.status_code]})']
